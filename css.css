@@ -1,0 +1,7 @@
+canvas{
+	border: 1px dotted;
+	position: relative;
+	display: block;
+	width: 80%;
+	height: 80%;
+}
