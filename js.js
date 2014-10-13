@@ -34,7 +34,7 @@ for(var y = 0.5; y < height; y = y + noofPixels){
 
 context.strokeStyle = "#bf4040"; //this is the color of the mesh.
 context.stroke();
-/* An advise is ignore looking at the grid. Forget it's there. Trust that it draws correctly*/
+/* An advice is ignore looking at the grid. Forget it's there. Trust that it draws correctly*/
 context.fillStyle = "#40bf45"; //this is the color of a cell. Square of noofPixels is called a cell.
 var colorCell = function(x, y){ //Given canvas cell coordinates, this colours the appropriate cell
 	context.fillRect(x, y, noofPixels, noofPixels);
