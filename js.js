@@ -63,6 +63,41 @@ var bresenham =
 			colorCell(x, y);
 			stateID = 2;
 		}
+		else{
+			var swapped = false;
+//			console.log(state.y2, state.y1, state.x2, state.x1);
+			if(Math.abs((state.y2 - state.y1)/(state.x2 - state.x1)) > 1){
+				console.log("no no");
+				var a = state.x1;
+				state.x1 = state.y1;
+				state.y1 = a;
+				a = state.x2;
+				state.x2 = state.y2;
+				state.y2 = a;
+				swapped = true; //if we want to keep this 'store' intact, we have to do some more things.
+			}
+			var error = 0, slope = Math.abs((state.y2 - state.y1)/(state.x2 - state.x1)), currentY = state.y1, currentX = state.x1;
+			var multiplierX = (state.x2 < state.x1) ? -1 : 1;
+//			console.log(multiplierX);
+			var multiplierY = (state.y2 < state.y1) ? -1 : 1;
+//			console.log(multiplierY);
+//			console.log(currentX, currentY);
+			for(;currentX != state.x2;currentX += multiplierX * noofPixels){
+				if(Math.abs(error) >= 0.5){
+					currentY += multiplierY * noofPixels;
+					error -= 1;
+					error += slope;
+				}
+				else{
+					error += slope;
+				}
+				console.log(currentX, currentY);
+				if(swapped) colorCell(currentY, currentX);
+				else colorCell(currentX, currentY);
+			}
+		}
+
+
 //		console.log(stateID);
 	};       
 })();
