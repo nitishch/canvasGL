@@ -13,29 +13,33 @@ canvas.style.height = height + "px";//these four lines maintain same intrinsic a
 //context.fillStyle = "#e7c7ec";
 //context.fillStyle = "#732664";
 //context.fillStyle = "#eadabf";
-context.fillStyle = "#732662"; //this is the color of the canvas.
-context.fillRect(0, 0, width, height);
 
 /*--------------------Ends Initialisation------------------------------*/
 
 var noofPixels = 50;
 var xoff = canvas.getBoundingClientRect().left, yoff = canvas.getBoundingClientRect().top;
 
-/* These two for-loops draw the grid */
-for(var x = 0.5; x < width; x = x + noofPixels){
-	context.moveTo(x, 0);
-	context.lineTo(x, height);
-}
 
-for(var y = 0.5; y < height; y = y + noofPixels){
-	context.moveTo(0, y);
-	context.lineTo(width, y);
+var init = function(){
+	context.fillStyle = "#732662"; //this is the color of the canvas.
+	context.fillRect(0, 0, width, height);
+	/* These two for-loops draw the grid */
+	for(var x = 0.5; x < width; x = x + noofPixels){
+		context.moveTo(x, 0);
+		context.lineTo(x, height);
+	}
+	
+	for(var y = 0.5; y < height; y = y + noofPixels){
+		context.moveTo(0, y);
+		context.lineTo(width, y);
+	}
+	context.strokeStyle = "#bf4040"; //this is the color of the mesh.
+	context.stroke();
+	/* An advice is ignore looking at the grid. Forget it's there. Trust that it draws correctly*/
+	context.fillStyle = "#40bf45"; //this is the color of a cell. Square of noofPixels is called a cell.
 }
+init();
 
-context.strokeStyle = "#bf4040"; //this is the color of the mesh.
-context.stroke();
-/* An advice is ignore looking at the grid. Forget it's there. Trust that it draws correctly*/
-context.fillStyle = "#40bf45"; //this is the color of a cell. Square of noofPixels is called a cell.
 var colorCell = function(x, y){ //Given canvas cell coordinates, this colours the appropriate cell
 	context.fillRect(x, y, noofPixels, noofPixels);
 } //this function is just for clarity and must be removed.
@@ -51,6 +55,10 @@ var bresenham =
 	var stateID = 0; //state 0 is zero cliks, 1 is 1 click, 2 is 2clicks. In stage 2, we have to draw the line
 	var state = {};
 	return function(x, y){ //Here x, y are in cell coordinates
+		if(stateID === 2){
+			init();
+			stateID = 0;
+		}
 		if(!stateID){
 			state.x1 = x;
 			state.y1 = y;
@@ -61,11 +69,7 @@ var bresenham =
 			state.x2 = x;
 			state.y2 = y;
 			colorCell(x, y);
-			stateID = 2;
-		}
-		else{
 			var swapped = false;
-//			console.log(state.y2, state.y1, state.x2, state.x1);
 			if(Math.abs((state.y2 - state.y1)/(state.x2 - state.x1)) > 1){
 				console.log("no no");
 				var a = state.x1;
@@ -78,27 +82,18 @@ var bresenham =
 			}
 			var error = 0, slope = Math.abs((state.y2 - state.y1)/(state.x2 - state.x1)), currentY = state.y1, currentX = state.x1;
 			var multiplierX = (state.x2 < state.x1) ? -1 : 1;
-//			console.log(multiplierX);
 			var multiplierY = (state.y2 < state.y1) ? -1 : 1;
-//			console.log(multiplierY);
-//			console.log(currentX, currentY);
 			for(;currentX != state.x2;currentX += multiplierX * noofPixels){
-				if(Math.abs(error) >= 0.5){
+				if(Math.abs(error) >= Math.abs(state.x2-state.x1)/2){
 					currentY += multiplierY * noofPixels;
-					error -= 1;
-					error += slope;
+					error -= Math.abs(state.x2 - state.x1);
 				}
-				else{
-					error += slope;
-				}
-				console.log(currentX, currentY);
+				error += Math.abs(state.y2 - state.y1);
 				if(swapped) colorCell(currentY, currentX);
 				else colorCell(currentX, currentY);
 			}
+			stateID = 2;
 		}
-
-
-//		console.log(stateID);
 	};       
 })();
 var color = function(event){
