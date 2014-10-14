@@ -8,4 +8,5 @@ Aim of this repository is to implement basic graphics algorithms like Bresenham,
 
 ###Issues
 
-When we go near to the pixel level, grid takes the entire space leaving less for the canvas.
+1. When we go near to the pixel level, grid takes the entire space leaving less for the canvas.
+2. This website is not responsive.
