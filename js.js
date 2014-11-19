@@ -1,8 +1,5 @@
-//var totalHeight = screen.availHeight;
-//var totalWidth = screen.availWidth;
 var fixedDimension = 600;
 var width = 2*fixedDimension, height = fixedDimension;
-//document.getElementById("output").firstChild.nodeValue = "height: " + height + "\n width: " + width;
 
 var canvas = document.getElementsByTagName("canvas")[0];
 var context = canvas.getContext("2d");
@@ -15,23 +12,27 @@ canvas.style.height = height + "px";//these four lines maintain same intrinsic a
 //context.fillStyle = "#eadabf";
 
 /*--------------------Ends Initialisation------------------------------*/
-
+document.getElementById("slider").setAttribute("min", 1);
+document.getElementById("slider").setAttribute("max", Math.min(width, height)/2);
 var noofPixels = 50;
 var xoff = canvas.getBoundingClientRect().left, yoff = canvas.getBoundingClientRect().top;
 
 
-var init = function(){
+var init = function(){ //remember canvas coordinates are devilish.
+	canvas.width = canvas.width; //this is redundant. This clears the canvas.
 	context.fillStyle = "#732662"; //this is the color of the canvas.
 	context.fillRect(0, 0, width, height);
 	/* These two for-loops draw the grid */
 	for(var x = 0.5; x < width; x = x + noofPixels){
 		context.moveTo(x, 0);
 		context.lineTo(x, height);
+//		console.log("at x = " + x);
 	}
 	
 	for(var y = 0.5; y < height; y = y + noofPixels){
 		context.moveTo(0, y);
 		context.lineTo(width, y);
+//		console.log("at y = " + y);
 	}
 	context.strokeStyle = "#bf4040"; //this is the color of the mesh.
 	context.stroke();
@@ -50,10 +51,11 @@ var changeCoord = function(x, y){ //this takes window coordinates and returns th
 			y: noofPixels * Math.floor((relativeY-1)/noofPixels),};
 }
 
+var state = {};
+var eventArray = []; //this is supposed to be of length 2 atmax. 
+var stateID = 0; //if stateID is = i, then we have got i clicks
 var bresenham = 
 (function(){
-	var stateID = 0; //state 0 is zero cliks, 1 is 1 click, 2 is 2clicks. In stage 2, we have to draw the line
-	var state = {};
 	return function(x, y){ //Here x, y are in cell coordinates
 		if(stateID === 2){
 			init();
@@ -98,9 +100,22 @@ var bresenham =
 })();
 var color = function(event){
 	var got = changeCoord(event.pageX, event.pageY);
-//	colorCell(got.x, got.y);
 	bresenham(got.x, got.y);
+	eventArray[stateID - 1] = event;
 }
 
+var seeked = function(a){
+	console.log("entered");
+//	a = document.getElementById("typer").value;
+	document.getElementById("value").value = a + "pixels/cell";
+	console.log(a);
+	noofPixels = Number(a);
+	init();
+	var dump = stateID;
+	stateID = 0;
+	for(var i = 0; i < dump; i++){
+		color(eventArray[i]);
+	}
+}
 
 canvas.addEventListener("click", color);
